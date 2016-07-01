@@ -21,7 +21,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = " hisab_kitab ";
     private static final String TABLE_USERS = "  users ";
     private static final String TABLE_CONTACTS = " contacts ";
-    private static final String TABLE_LEN_DEN = " lenden ";
+    private static final String TABLE_LEN_DEN = " lenden ";;
 
     private static final String KEY_ID = " user_id ";
     private static final String KEY_FNAME = " fname ";
