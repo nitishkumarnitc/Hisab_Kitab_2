@@ -2,12 +2,15 @@ package services;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+
+import com.example.sameershekhar.hisab_kitab.Home;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,10 +41,11 @@ public class DataBaseHandler extends SQLiteOpenHelper {
     private static final String KEY_DESC=" descp ";
     private static final String KEY_STATUS=" status ";
     private static final String KEY_SEX=" sex ";
-
+    Context context;
 
     public DataBaseHandler(Context context) {
         super(context, DATABASE_NAME, null, 1);
+        this.context=context;
 
     }
 
@@ -50,7 +54,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 
         Log.d("ONCREATE DBHandler", "before users table");
         String sql = "CREATE TABLE " + TABLE_USERS + "(" + KEY_ID + " INTEGER PRIMARY KEY, "
-                + KEY_FNAME + "TEXT ," + KEY_LNAME + "TEXT ," + KEY_SEX + " TEXT, "+ KEY_EMAIL + "TEXT," + KEY_PASS + "TEXT," + KEY_MOBILE + "TEXT, " + KEY_DATE +
+                + KEY_FNAME + "TEXT ," + KEY_LNAME + "TEXT ," + KEY_SEX + " TEXT, "+ KEY_EMAIL + "TEXT,"+ KEY_MOBILE + "TEXT, " + KEY_DATE +
                 "TEXT " + ")";
         db.execSQL(sql);
         Log.d("ONCREATE", "after users table");
@@ -75,7 +79,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void insertUsers(int keyId,String fname,String lname,String email,String mobile,String sex,String date)
+    public boolean insertUsers(int keyId,String fname,String lname,String email,String mobile,String sex,String date)
     {
         SQLiteDatabase database=this.getWritableDatabase();
         ContentValues values=new ContentValues();
@@ -83,11 +87,19 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         values.put(KEY_FNAME,fname);
         values.put(KEY_LNAME,lname);
         values.put(KEY_EMAIL,email);
-        values.put(KEY_SEX,sex);
+        values.put(KEY_SEX, sex);
         values.put(KEY_MOBILE, mobile);
         values.put(KEY_DATE, date);
-        database.insert(TABLE_USERS, null, values);
+       long x=database.insert(TABLE_USERS, null, values);
+        Log.d("Dbhandler", "inserting uerse");
         database.close();
+        if(x==-1)
+            return  false;
+        else
+            return true;
+
+
+
 
     }
     public void addContacts(int id,String date)

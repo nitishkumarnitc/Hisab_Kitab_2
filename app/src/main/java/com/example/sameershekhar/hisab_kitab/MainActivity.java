@@ -2,22 +2,41 @@ package com.example.sameershekhar.hisab_kitab;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import loginsignup.Login;
 import loginsignup.Signup;
 import services.AndroidDatabaseManager;
+import services.DataBaseHandler;
+import services.UserFunction;
 
 public class MainActivity extends AppCompatActivity {
 
     Button loginButton,signButton,dbManager;
+
+    UserFunction userFunction=new UserFunction();
+    JSONObject loginjsonobject=new JSONObject();
+    private View rootView=null;
+    private Context context=null;
+
+    private   String KEY_EMAIL = "email";
+    private  String KEY_PASS = "password";
+
+    EditText email,password;
+    Button loginbtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,28 +47,55 @@ public class MainActivity extends AppCompatActivity {
             StrictMode.setThreadPolicy(policy);
         }
 
-        loginButton=(Button)findViewById(R.id.button_login);
-        signButton=(Button)findViewById(R.id.button_signup);
+        loginButton=(Button)findViewById(R.id.l_button);
+        signButton=(Button)findViewById(R.id.l_signbtn);
+        email=(EditText)findViewById(R.id.l_email);
+        password=(EditText)findViewById(R.id.l_password);
         dbManager=(Button)findViewById(R.id.dataBaseManager);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentManager fragmentManager=getFragmentManager();
-                FragmentTransaction fragmentTransaction=fragmentManager.beginTransaction();
-                Login bot= new Login();
-                fragmentTransaction.add(R.id.fragment_container,bot,"ccc");
-                fragmentTransaction.commit();
+                Log.d("Main","tag0");
+
+                DataBaseHandler dataBaseHandler=new DataBaseHandler(context);
+                KEY_EMAIL=email.getText().toString();
+                KEY_PASS=password.getText().toString();
+                Log.d("Main","tag1");
+
+                loginjsonobject=userFunction.login(KEY_EMAIL, KEY_PASS);
+                Log.d("Main","tag2");
+                try {
+                    String res=loginjsonobject.getString("success");
+                    if(res!=null)
+                    {
+                        int successKey=Integer.parseInt(res);
+                        if(successKey==1)
+                        {
+                            JSONObject jsonObjectuser=loginjsonobject.getJSONObject("user");
+                            dataBaseHandler.insertUsers(jsonObjectuser.getInt("id"), jsonObjectuser.getString("fname"),
+                                    jsonObjectuser.getString("lname"), jsonObjectuser.getString("email_id"),
+                                    jsonObjectuser.getString("mobile_no"), jsonObjectuser.getString("sex"), jsonObjectuser.getString("created_at"));
+                               Intent intent=new Intent(context,Home.class);
+                               context.startActivity(intent);
+
+                        }
+
+                    }
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
             }
         });
 
         signButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentManager fragmentManager=getFragmentManager();
-                FragmentTransaction fragmentTransaction=fragmentManager.beginTransaction();
-                Signup bot= new Signup();
-                fragmentTransaction.add(R.id.fragment_container,bot,"ccc");
-                fragmentTransaction.commit();
+                Intent intent=new Intent(getApplicationContext(),SignUp.class);
+                startActivity(intent);
+
             }
         });
 

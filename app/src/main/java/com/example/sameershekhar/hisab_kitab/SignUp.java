@@ -1,20 +1,15 @@
-package loginsignup;
+package com.example.sameershekhar.hisab_kitab;
 
-
-import android.content.Context;
 import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
-
-import com.example.sameershekhar.hisab_kitab.Home;
-import com.example.sameershekhar.hisab_kitab.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,23 +18,13 @@ import org.json.JSONObject;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import services.AsyncResponse;
-import services.CheckNetwork;
 import services.DataBaseHandler;
 import services.UserFunction;
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class Signup extends Fragment implements AsyncResponse {
+public class SignUp extends AppCompatActivity {
 
 
-
-
-   UserFunction userFunction=new UserFunction();
-    private View rootView=null;
-    private Context context=null;
-
+    UserFunction userFunction=new UserFunction();
     private  String KEY_ID = "id";
     private  String KEY_FNAME = "fname";
     private   String KEY_LNAME = "lname";
@@ -58,38 +43,27 @@ public class Signup extends Fragment implements AsyncResponse {
     JSONObject signjsonObject=new JSONObject();
     JSONArray jsonArray=new JSONArray();
 
-
-
-    public Signup() {
-        // Required empty public constructor
-    }
-
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_sign_up);
+        firstName=(EditText)findViewById(R.id.r_fname);
+        lastName=(EditText)findViewById(R.id.r_lname);
+        email=(EditText)findViewById(R.id.r_email);
+        password=(EditText)findViewById(R.id.r_pass);
+        mobile=(EditText)findViewById(R.id.r_mobile);
 
-        rootView=inflater.inflate(R.layout.fragment_signup, container, false);
-        context=inflater.getContext();
+        radioGroup= (RadioGroup)findViewById(R.id.r_sex);
+        register= (Button)findViewById(R.id.r_signupbutton);
 
-        firstName=(EditText)rootView.findViewById(R.id.r_fname);
-        lastName=(EditText) rootView.findViewById(R.id.r_lname);
-        email=(EditText) rootView.findViewById(R.id.r_email);
-        password=(EditText) rootView.findViewById(R.id.r_pass);
-        mobile=(EditText) rootView.findViewById(R.id.r_mobile);
 
-        radioGroup= (RadioGroup) rootView.findViewById(R.id.r_sex);
-        register= (Button) rootView.findViewById(R.id.r_signupbutton);
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 signUp(v);
             }
         });
-        return rootView;
-
     }
-
 
     public void signUp(View view)
     {
@@ -104,7 +78,7 @@ public class Signup extends Fragment implements AsyncResponse {
         if(id==R.id.rd_female)
             KEY_SEX="female";
         else
-        KEY_SEX="male";
+            KEY_SEX="male";
 
         Log.d("Sign up ", "signUp Called");
 
@@ -128,7 +102,7 @@ public class Signup extends Fragment implements AsyncResponse {
             /*CheckNetwork checkNetwork=new CheckNetwork(context);
             checkNetwork.delegate=this;
             checkNetwork.execute();*/
-            DataBaseHandler dataBaseHandler=new DataBaseHandler(context);
+            DataBaseHandler dataBaseHandler=new DataBaseHandler(this);
             Log.d("Sign up ", "Calling user function sign up");
             signjsonObject=userFunction.signup(KEY_FNAME, KEY_LNAME, KEY_SEX, KEY_EMAIL, KEY_PASS, KEY_MOBILE);
 
@@ -144,13 +118,17 @@ public class Signup extends Fragment implements AsyncResponse {
                     if(successKey==1)
                     {
                         JSONObject jsonObjectuser=signjsonObject.getJSONObject("user");
-                        dataBaseHandler.insertUsers(jsonObjectuser.getInt("id"),jsonObjectuser.getString("fname"),
+                       boolean x=dataBaseHandler.insertUsers(jsonObjectuser.getInt("id"),jsonObjectuser.getString("fname"),
                                 jsonObjectuser.getString("lname"),jsonObjectuser.getString("email_id"),
-                                jsonObjectuser.getString("mobile_no"),jsonObjectuser.getString("sex"),jsonObjectuser.getString("created_at"));
-                        Log.d("Signup1","after inseting data1");
-                               Intent intent=new Intent(getActivity().getApplicationContext(), Home.class);
-                        Log.d("Signup2","after inseting data2");
-                             getActivity().startActivity(intent);
+                               jsonObjectuser.getString("mobile_no"),jsonObjectuser.getString("sex"),jsonObjectuser.getString("created_at"));
+                        if(x)
+                        Log.d("Signup1","success");
+                        else
+                            Log.d("Signup1","fail");
+                        Intent intent=new Intent(SignUp.this,Home.class);
+                        startActivity(intent);
+                        Log.d("Signup2", "after inseting data2");
+
                         Log.d("Signup3", "after inseting data3");
 
 
@@ -161,37 +139,6 @@ public class Signup extends Fragment implements AsyncResponse {
                 e.printStackTrace();
             }
 
-        }
-    }
-
-
-
-    @Override
-    public void processFinish(boolean output) {
-        if(output)
-        {
-           signjsonObject=userFunction.signup(KEY_FNAME, KEY_LNAME, KEY_SEX, KEY_EMAIL, KEY_PASS, KEY_MOBILE);
-            try {
-                String res=signjsonObject.getString("success");
-                if(res!=null)
-                {
-                    int successKey=Integer.parseInt(res);
-                    if(successKey==1)
-                    {     DataBaseHandler dataBaseHandler=new DataBaseHandler(context);
-                          JSONObject jsonObjectuser=signjsonObject.getJSONObject("user");
-                          dataBaseHandler.insertUsers(jsonObjectuser.getInt("id"),jsonObjectuser.getString("fname"),
-                                  jsonObjectuser.getString("lname"),jsonObjectuser.getString("email_id"),
-                                  jsonObjectuser.getString("mobile_no"),jsonObjectuser.getString("sex"),jsonObjectuser.getString("created_at"));
-
-
-                    }
-
-                }
-
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -234,4 +181,6 @@ public class Signup extends Fragment implements AsyncResponse {
         }
         return false;
     }
+
+
 }
