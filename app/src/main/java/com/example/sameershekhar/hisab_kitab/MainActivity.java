@@ -2,6 +2,7 @@ package com.example.sameershekhar.hisab_kitab;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,10 +13,11 @@ import android.widget.Button;
 
 import loginsignup.Login;
 import loginsignup.Signup;
+import services.AndroidDatabaseManager;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button loginButton,signButton;
+    Button loginButton,signButton,dbManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
         loginButton=(Button)findViewById(R.id.button_login);
         signButton=(Button)findViewById(R.id.button_signup);
+        dbManager=(Button)findViewById(R.id.dataBaseManager);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -50,6 +53,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        dbManager.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent dbmanager = new Intent(getApplicationContext(),AndroidDatabaseManager.class);
+                startActivity(dbmanager);
+            }
+        });
 
     }
 
