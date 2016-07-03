@@ -5,7 +5,7 @@
     <ImageView
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:id="@+id/imageView2"
+        android:id="@+id/contact_image"
         android:src="@drawable/srk"
         android:layout_centerVertical="true"
         android:layout_alignParentStart="true" />

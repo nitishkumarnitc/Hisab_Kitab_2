@@ -1,6 +1,9 @@
 package com.example.sameershekhar.hisab_kitab;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,12 +22,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import services.DataBaseHandler;
+import services.ID;
 import services.UserFunction;
+import services.Validator;
 
 public class SignUp extends AppCompatActivity {
 
-
     UserFunction userFunction=new UserFunction();
+    DataBaseHandler dataBaseHandler=new DataBaseHandler(SignUp.this);
     private  String KEY_ID = "id";
     private  String KEY_FNAME = "fname";
     private   String KEY_LNAME = "lname";
@@ -82,105 +87,99 @@ public class SignUp extends AppCompatActivity {
 
         Log.d("Sign up ", "signUp Called");
 
-        if (!isValidName(KEY_FNAME)) {
+        if (!Validator.isValidName(KEY_FNAME)) {
             firstName.setError("Invalid Fname");
         }
-        else if (!isValidName(KEY_LNAME)) {
+        else if (!Validator.isValidName(KEY_LNAME)) {
             lastName.setError("Invalid Lname");
         }
-        else if (!isValidEmail(KEY_EMAIL)) {
+        else if (!Validator.isValidEmail(KEY_EMAIL)) {
             email.setError("Invalid Email");
         }
-        else if (!isValidPassword(KEY_PASS)) {
+        else if (!Validator.isValidPassword(KEY_PASS)) {
             password.setError("Invalid Password");
         }
-        else if (!isValidPhone(KEY_MOBILE)) {
+        else if (!Validator.isValidPhone(KEY_MOBILE)) {
             mobile.setError("Invalid Phone num");
         }
         else
         {
-            /*CheckNetwork checkNetwork=new CheckNetwork(context);
-            checkNetwork.delegate=this;
-            checkNetwork.execute();*/
-            DataBaseHandler dataBaseHandler=new DataBaseHandler(this);
-            Log.d("Sign up ", "Calling user function sign up");
-            signjsonObject=userFunction.signup(KEY_FNAME, KEY_LNAME, KEY_SEX, KEY_EMAIL, KEY_PASS, KEY_MOBILE);
 
-            if(signjsonObject==null){
-                Log.d("Sign up ", signjsonObject +"is null");
-            }
+            new ProccessSignUp().execute();
+        }
+    }
 
-            try {
-                String res=signjsonObject.getString("success");
-                if(res!=null)
-                {
-                    int successKey=Integer.parseInt(res);
-                    if(successKey==1)
-                    {
-                        JSONObject jsonObjectuser=signjsonObject.getJSONObject("user");
+    void startHome()
+    {
+        Log.d("StartHome","i am in starthome ");
+        Intent intent=new Intent(SignUp.this,Home.class);
+        SignUp.this.startActivity(intent);
+
+    }
+
+   private class ProccessSignUp extends AsyncTask<String,Void,JSONObject>
+
+   {
+
+
+       @Override
+       protected void onPreExecute() {
+           super.onPreExecute();
+
+       }
+
+       @Override
+       protected void onPostExecute(JSONObject signjsonObject) {
+           //super.onPostExecute(jsonObject);
+           JSONObject jsonObjectuser=null;
+
+           if(signjsonObject==null){
+               Log.d("Sign up ", signjsonObject +"is null");
+           }
+
+           try {
+               //dataBaseHandler.resetUserTables();
+               String res=signjsonObject.getString("success");
+               if(res!=null)
+               {
+                   int successKey=Integer.parseInt(res);
+                   if(successKey==1)
+                   {
+                        jsonObjectuser=signjsonObject.getJSONObject("user");
                        boolean x=dataBaseHandler.insertUsers(jsonObjectuser.getInt("id"),jsonObjectuser.getString("fname"),
-                                jsonObjectuser.getString("lname"),jsonObjectuser.getString("email_id"),
+                               jsonObjectuser.getString("lname"),jsonObjectuser.getString("email_id"),
                                jsonObjectuser.getString("mobile_no"),jsonObjectuser.getString("sex"),jsonObjectuser.getString("created_at"));
-                        if(x)
-                        Log.d("Signup1","success");
-                        else
-                            Log.d("Signup1","fail");
-                        Intent intent=new Intent(SignUp.this,Home.class);
-                        startActivity(intent);
-                        Log.d("Signup2", "after inseting data2");
 
-                        Log.d("Signup3", "after inseting data3");
+                       ID.CURRENTUSERID=jsonObjectuser.getInt("id");
 
+                       if(x)
+                           Log.d("Signup1","success");
+                       else
+                           Log.d("Signup1","fail");
 
-                    }
+                   }
 
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-        }
-    }
-
-    private static boolean isValidEmail(String email) {
-        String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
-                + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-
-        Pattern pattern = Pattern.compile(EMAIL_PATTERN);
-        Matcher matcher = pattern.matcher(email);
-        return matcher.matches();
-    }
-
-    //validating phonenum
-
-    private static boolean isValidPhone(String phone) {
-        String MobilePattern = "[0-9]{10}";
-        Pattern pattern = Pattern.compile(MobilePattern);
-        Matcher matcher = pattern.matcher(phone);
-        return matcher.matches();
-    }
+               }
+           } catch (JSONException e) {
+               e.printStackTrace();
+           }
 
 
-    // validating name
-    private static boolean isValidName(String name) {
-        String roomPattern = "[A-Za-z]+";
-        Pattern pattern = Pattern.compile(roomPattern);
-        Matcher matcher = pattern.matcher(name);
-        return matcher.matches();
-    }
+           startHome();
 
-    //validating hostel
+       }
+
+       @Override
+       protected JSONObject doInBackground(String... params) {
+
+           Log.d("Sign up ", "Calling user function sign up");
+           signjsonObject=userFunction.signup(KEY_FNAME, KEY_LNAME, KEY_SEX, KEY_EMAIL, KEY_PASS, KEY_MOBILE);
+
+           return signjsonObject;
+       }
+   }
 
 
-
-
-    // validating password with retype password
-    private static boolean isValidPassword(String pass) {
-        if (pass != null && pass.length() > 1) {
-            return true;
-        }
-        return false;
-    }
 
 
 }

@@ -17,8 +17,7 @@ import android.widget.EditText;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import loginsignup.Login;
-import loginsignup.Signup;
+
 import services.AndroidDatabaseManager;
 import services.DataBaseHandler;
 import services.UserFunction;
@@ -29,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
     UserFunction userFunction=new UserFunction();
     JSONObject loginjsonobject=new JSONObject();
-    private View rootView=null;
+
     private Context context=null;
 
     private   String KEY_EMAIL = "email";
@@ -55,37 +54,9 @@ public class MainActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("Main","tag0");
-
-                DataBaseHandler dataBaseHandler=new DataBaseHandler(context);
-                KEY_EMAIL=email.getText().toString();
-                KEY_PASS=password.getText().toString();
-                Log.d("Main","tag1");
-
-                loginjsonobject=userFunction.login(KEY_EMAIL, KEY_PASS);
-                Log.d("Main","tag2");
-                try {
-                    String res=loginjsonobject.getString("success");
-                    if(res!=null)
-                    {
-                        int successKey=Integer.parseInt(res);
-                        if(successKey==1)
-                        {
-                            JSONObject jsonObjectuser=loginjsonobject.getJSONObject("user");
-                            dataBaseHandler.insertUsers(jsonObjectuser.getInt("id"), jsonObjectuser.getString("fname"),
-                                    jsonObjectuser.getString("lname"), jsonObjectuser.getString("email_id"),
-                                    jsonObjectuser.getString("mobile_no"), jsonObjectuser.getString("sex"), jsonObjectuser.getString("created_at"));
-                               Intent intent=new Intent(context,Home.class);
-                               context.startActivity(intent);
-
-                        }
-
-                    }
 
 
-                } catch (JSONException e) {
-                    e.printStackTrace();;
-                }
+                logIn(v);
 
             }
         });
@@ -93,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         signButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Intent intent=new Intent(getApplicationContext(),SignUp.class);
                 startActivity(intent);
 
@@ -109,5 +81,35 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    void logIn(View v)
+    {
+        Log.d("Main","tag0");
 
+        DataBaseHandler dataBaseHandler=new DataBaseHandler(this);
+        KEY_EMAIL=email.getText().toString();
+        KEY_PASS=password.getText().toString();
+        Log.d("Main","tag1");
+
+        loginjsonobject=userFunction.login(KEY_EMAIL, KEY_PASS);
+        Log.d("Main", "tag2");
+        try {
+            String res=loginjsonobject.getString("success");
+            if(res!=null)
+            {
+                int successKey=Integer.parseInt(res);
+                if(successKey==1)
+                {
+                    JSONObject jsonObjectuser=loginjsonobject.getJSONObject("user");
+                    dataBaseHandler.insertUsers(jsonObjectuser.getInt("id"), jsonObjectuser.getString("fname"),
+                            jsonObjectuser.getString("lname"), jsonObjectuser.getString("email_id"),
+                            jsonObjectuser.getString("mobile_no"), jsonObjectuser.getString("sex"), jsonObjectuser.getString("created_at"));
+                    Intent intent=new Intent(MainActivity.this,Home.class);
+                    MainActivity.this.startActivity(intent);
+
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 }

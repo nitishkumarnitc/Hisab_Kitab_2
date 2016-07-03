@@ -18,6 +18,9 @@ import java.util.HashMap;
 /**
  * Created by sameershekhar on 29-Jun-16.
  */
+
+
+
 public class DataBaseHandler extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 1;
@@ -42,6 +45,8 @@ public class DataBaseHandler extends SQLiteOpenHelper {
     private static final String KEY_STATUS=" status ";
     private static final String KEY_SEX=" sex ";
     Context context;
+
+
 
     public DataBaseHandler(Context context) {
         super(context, DATABASE_NAME, null, 1);
@@ -108,7 +113,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         ContentValues values=new ContentValues();
         values.put(KEY_ID2,id);
         values.put(KEY_DATE,date);
-        database.insert(TABLE_CONTACTS,null,values);
+        database.insert(TABLE_CONTACTS, null, values);
         database.close();
     }
 
@@ -129,27 +134,53 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 
     }
 */
-    public HashMap<String,String> getUserdata() {
-        HashMap<String,String> userMap=new HashMap<>();
+    public User getUserdata() {
 
+        Log.d("GetuserData","i am in getuserdata");
+        User user=new User();
+        //Log.d("USERID", Integer.toString(u));
 
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from " + TABLE_USERS, null);
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_USERS + "WHERE user_id ="+ ID.CURRENTUSERID, null);
         cursor.moveToFirst();
-        while(cursor.getCount()>0)
-        {
-            userMap.put("fname",cursor.getString(1));
-            userMap.put("lname",cursor.getString(2));
-            userMap.put("email",cursor.getString(3));
-            userMap.put("sex",cursor.getString(4));
-            userMap.put("mobile",cursor.getString(5));
-            userMap.put("date",cursor.getString(6));
+        while (cursor.moveToNext()){
 
-
+            user.user_id=cursor.getInt(0);
+            user.fname=cursor.getString(1);
+            user.lname=cursor.getString(2);
+            user.sex=cursor.getString(3);
+            user.email=cursor.getString(4);
+            user.mobile=cursor.getString(5);
         }
-        cursor.close();
+
         db.close();
-        return userMap;
+        return user;
+    }
+
+    public ArrayList<User> getUserContacts()
+    {
+        ArrayList<User> users=new ArrayList<>();
+        Log.d("GetuserData","i am in getuserdata");
+        //Log.d("USERID", Integer.toString(u));
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_USERS + "WHERE user_id !="+ ID.CURRENTUSERID, null);
+        cursor.moveToFirst();
+        while (cursor.moveToNext()){
+            User user=new User();
+            user.user_id=cursor.getInt(0);
+            user.fname=cursor.getString(1);
+            user.lname=cursor.getString(2);
+            user.sex=cursor.getString(3);
+            user.email=cursor.getString(4);
+            user.mobile=cursor.getString(5);
+            users.add(user);
+        }
+
+        db.close();
+        return users;
+
+
     }
 
  /* checking user is login or not*/
@@ -180,7 +211,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 
     //Re Create the table, Delete the tables and create them again
 
-    public void resetTables(){
+    public void resetUserTables(){
         SQLiteDatabase database=this.getWritableDatabase();
         database.delete(TABLE_USERS,null,null);
         database.close();

@@ -1,6 +1,7 @@
 package services;
 
 
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -16,11 +17,13 @@ public class UserFunction {
 
    // private static String homeAddress="http://www.mistu.org/";
     private static String url="http://www.mistu.org/HisabKitab/";
+    private static String url_details="http://www.mistu.org/HisabKitab/details/";
     //private static String url="http://192.168.0.3/project/register.php"
     private static String login_tag="login";
     private static String register_tag="register";
     private static String forpass_tag="forpass";
     private static String chgpass_tag="chgpass";
+    private static String getuserscontact_tag="usercontactdetails";
 
 
     public UserFunction(){
@@ -30,6 +33,7 @@ public class UserFunction {
 
     public JSONObject login(String email,String pass)
     {
+        Log.d("UserFunction","i Am  in login");
         JSONObject params=new JSONObject();
         try {
             params.put("tag",login_tag);
@@ -95,6 +99,18 @@ public class UserFunction {
             e.printStackTrace();
         }
         return jsonParser.getJsonFromUrl(url,"POST",params);
+    }
+    public JSONObject getUserContacts(int curretn_id)
+    {
+        curretn_id=66;
+        JSONObject params=new JSONObject();
+        try {
+            params.put("tag",getuserscontact_tag);
+            params.put("id",curretn_id);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonParser.getJsonFromUrl(url_details,"POST",params);
     }
 
 
