@@ -196,7 +196,7 @@ class GetUsersContacts extends AsyncTask<String,Void,JSONObject>
             if (row == null) {
                 LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 row = inflater.inflate(R.layout.contacts, parent, false);
-               // row = View.inflate(context,R.layout.contacts,null);
+
                 holder = new ViewHolder(row);
                 row.setTag(holder);
             } else {
