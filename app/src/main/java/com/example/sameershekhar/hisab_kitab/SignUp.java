@@ -29,7 +29,7 @@ import services.Validator;
 public class SignUp extends AppCompatActivity {
 
     UserFunction userFunction=new UserFunction();
-    DataBaseHandler dataBaseHandler=new DataBaseHandler(SignUp.this);
+    DataBaseHandler dataBaseHandler;
     private  String KEY_ID = "id";
     private  String KEY_FNAME = "fname";
     private   String KEY_LNAME = "lname";
@@ -43,6 +43,7 @@ public class SignUp extends AppCompatActivity {
     EditText firstName,lastName,email,password,mobile;
     Button register;
     RadioGroup radioGroup;
+    Button login;
 
 
     JSONObject signjsonObject=new JSONObject();
@@ -52,6 +53,7 @@ public class SignUp extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
+        dataBaseHandler=new DataBaseHandler(SignUp.this);
         firstName=(EditText)findViewById(R.id.r_fname);
         lastName=(EditText)findViewById(R.id.r_lname);
         email=(EditText)findViewById(R.id.r_email);
@@ -60,6 +62,14 @@ public class SignUp extends AppCompatActivity {
 
         radioGroup= (RadioGroup)findViewById(R.id.r_sex);
         register= (Button)findViewById(R.id.r_signupbutton);
+        login=(Button) findViewById(R.id.s_loginbutton);
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mainIntent=new Intent(SignUp.this,MainActivity.class);
+                SignUp.this.startActivity(mainIntent);
+            }
+        });
 
 
         register.setOnClickListener(new View.OnClickListener() {
@@ -125,6 +135,7 @@ public class SignUp extends AppCompatActivity {
        @Override
        protected void onPreExecute() {
            super.onPreExecute();
+           dataBaseHandler.resetUserTables();
 
        }
 
@@ -138,7 +149,7 @@ public class SignUp extends AppCompatActivity {
            }
 
            try {
-               //dataBaseHandler.resetUserTables();
+
                String res=signjsonObject.getString("success");
                if(res!=null)
                {

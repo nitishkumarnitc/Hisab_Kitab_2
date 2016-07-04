@@ -121,7 +121,7 @@
         android:layout_height="wrap_content"
         android:text="Login"
         android:background="#3c137ada"
-        android:id="@+id/r_loginbutton"
+        android:id="@+id/s_loginbutton"
         android:layout_below="@+id/relativeLayout"
         android:layout_centerHorizontal="true" />
 

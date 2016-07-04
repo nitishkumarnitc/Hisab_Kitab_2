@@ -2,6 +2,7 @@ package com.example.sameershekhar.hisab_kitab;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -14,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -42,11 +44,14 @@ public class Home extends Activity {
     Cursor userCursor;
     TextView name,email;
     ListView listView;
+
+    Button logOutButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         dataBaseHandler=new DataBaseHandler(Home.this);
+
          Log.d("Home", "i am in home");
         name=(TextView)findViewById(R.id.h_name);
         email=(TextView)findViewById(R.id.h_email);
@@ -54,8 +59,20 @@ public class Home extends Activity {
 
 
         User user=dataBaseHandler.getUserdata();
-        name.setText(user.lname+ " "+user.lname );
+        name.setText(user.fname+ " "+user.lname );
         email.setText(user.email);
+
+        logOutButton=(Button)findViewById(R.id.h_logout);
+
+        logOutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dataBaseHandler.resetUserTables();
+                Intent mainIntent=new Intent(Home.this,MainActivity.class);
+                Home.this.startActivity(mainIntent);
+
+            }
+        });
 
 
         new GetUsersContacts().execute();
@@ -98,13 +115,16 @@ class GetUsersContacts extends AsyncTask<String,Void,JSONObject>
                     while (i<size) {
                         JSONObject user =  jsonUserArray.getJSONObject(i);
 
-
                             boolean x=dataBaseHandler.insertUsers(user.getInt("id"),user.getString("fname"),
                             user.getString("lname"),user.getString("email_id"),
                             user.getString("mobile_no"),user.getString("sex"),user.getString("created_at"));
                             i++;
                     }
 
+                }
+                else if(successKey==0){
+                    Log.d("Home:GetContactsAsync","No Contacts found");
+                    return;
                 }
 
             }
@@ -131,14 +151,12 @@ class GetUsersContacts extends AsyncTask<String,Void,JSONObject>
         listView.setAdapter(adapter);
 
 
-        //super.onPostExecute(jsonObject);
-
     }
 
     @Override
     protected JSONObject doInBackground(String... params) {
 
-        UsersContacts=userFunction.getUserContacts(ID.CURRENTUSERID);
+        UsersContacts=userFunction.getUserContacts();
         return UsersContacts ;
     }
 }

@@ -100,13 +100,13 @@ public class UserFunction {
         }
         return jsonParser.getJsonFromUrl(url,"POST",params);
     }
-    public JSONObject getUserContacts(int curretn_id)
+    public JSONObject getUserContacts()
     {
-        curretn_id=66;
+
         JSONObject params=new JSONObject();
         try {
             params.put("tag",getuserscontact_tag);
-            params.put("id",curretn_id);
+            params.put("id",ID.CURRENTUSERID);
         } catch (JSONException e) {
             e.printStackTrace();
         }

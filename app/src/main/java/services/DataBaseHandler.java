@@ -136,23 +136,26 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 */
     public User getUserdata() {
 
-        Log.d("GetuserData","i am in getuserdata");
+        Log.d("GetuserData","i am in get User Data");
         User user=new User();
-        //Log.d("USERID", Integer.toString(u));
 
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_USERS + "WHERE user_id ="+ ID.CURRENTUSERID, null);
-        cursor.moveToFirst();
-        while (cursor.moveToNext()){
+        String query="SELECT * FROM "+ TABLE_USERS + "WHERE user_id=" +ID.CURRENTUSERID;
+        Cursor cursor = db.rawQuery(query, null);
 
-            user.user_id=cursor.getInt(0);
-            user.fname=cursor.getString(1);
-            user.lname=cursor.getString(2);
-            user.sex=cursor.getString(3);
-            user.email=cursor.getString(4);
-            user.mobile=cursor.getString(5);
+        if (cursor.moveToFirst()){
+            do{
+
+                user.fname=cursor.getString(1);
+                user.lname=cursor.getString(2);
+                user.sex=cursor.getString(3);
+                user.email=cursor.getString(4);
+                user.mobile=cursor.getString(5);
+
+                Log.d("User",user.fname+user.lname+user.email);
+            }while(cursor.moveToNext());
         }
-
+        cursor.close();
         db.close();
         return user;
     }
@@ -160,23 +163,29 @@ public class DataBaseHandler extends SQLiteOpenHelper {
     public ArrayList<User> getUserContacts()
     {
         ArrayList<User> users=new ArrayList<>();
-        Log.d("GetuserData","i am in getuserdata");
-        //Log.d("USERID", Integer.toString(u));
+        Log.d("GetuserData","i am in getUserContacts");
+
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_USERS + "WHERE user_id !="+ ID.CURRENTUSERID, null);
-        cursor.moveToFirst();
-        while (cursor.moveToNext()){
-            User user=new User();
-            user.user_id=cursor.getInt(0);
-            user.fname=cursor.getString(1);
-            user.lname=cursor.getString(2);
-            user.sex=cursor.getString(3);
-            user.email=cursor.getString(4);
-            user.mobile=cursor.getString(5);
-            users.add(user);
-        }
 
+        if(cursor==null) return users;
+
+
+        if (cursor.moveToFirst()){
+            do{
+                User user=new User();
+                user.user_id=cursor.getInt(0);
+                user.fname=cursor.getString(1);
+                user.lname=cursor.getString(2);
+                user.sex=cursor.getString(3);
+                user.email=cursor.getString(4);
+                user.mobile=cursor.getString(5);
+                users.add(user);
+                Log.d("User",user.fname+user.lname+user.email);
+            }while(cursor.moveToNext());
+        }
+        cursor.close();
         db.close();
         return users;
 

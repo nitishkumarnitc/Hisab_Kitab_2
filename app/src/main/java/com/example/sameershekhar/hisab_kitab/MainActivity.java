@@ -20,6 +20,7 @@ import org.json.JSONObject;
 
 import services.AndroidDatabaseManager;
 import services.DataBaseHandler;
+import services.ID;
 import services.UserFunction;
 
 public class MainActivity extends AppCompatActivity {
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
     UserFunction userFunction=new UserFunction();
     JSONObject loginjsonobject=new JSONObject();
+    DataBaseHandler dataBaseHandler;
 
     private Context context=null;
 
@@ -35,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
     private  String KEY_PASS = "password";
 
     EditText email,password;
-    Button loginbtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +56,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-
+                dataBaseHandler=new DataBaseHandler(MainActivity.this);
+                dataBaseHandler.resetUserTables();
                 logIn(v);
 
             }
@@ -84,8 +86,8 @@ public class MainActivity extends AppCompatActivity {
     void logIn(View v)
     {
         Log.d("Main","tag0");
-
         DataBaseHandler dataBaseHandler=new DataBaseHandler(this);
+
         KEY_EMAIL=email.getText().toString();
         KEY_PASS=password.getText().toString();
         Log.d("Main","tag1");
@@ -103,6 +105,8 @@ public class MainActivity extends AppCompatActivity {
                     dataBaseHandler.insertUsers(jsonObjectuser.getInt("id"), jsonObjectuser.getString("fname"),
                             jsonObjectuser.getString("lname"), jsonObjectuser.getString("email_id"),
                             jsonObjectuser.getString("mobile_no"), jsonObjectuser.getString("sex"), jsonObjectuser.getString("created_at"));
+                    ID.CURRENTUSERID=jsonObjectuser.getInt("id");
+
                     Intent intent=new Intent(MainActivity.this,Home.class);
                     MainActivity.this.startActivity(intent);
 
